@@ -178,20 +178,53 @@ mongoose.connect(db, function(err){
     }
 });
 
+// function verifyToken(req, res, next) {
+//   if(!req.headers.authorization) {
+//     return res.status(401).send('Unauthorized request')
+//   }
+//   let token = req.headers.authorization.split(' ')[1]
+//   if(token === 'null') {
+//     return res.status(401).send('Unauthorized request')    
+//   }
+//   let payload = jwt.verify(token, 'secretKey')
+//   if(!payload) {
+//     return res.status(401).send('Unauthorized request')    
+//   }
+//   req.userId = payload.subject
+//   next()
+// }
+
 function verifyToken(req, res, next) {
-  if(!req.headers.authorization) {
-    return res.status(401).send('Unauthorized request')
-  }
+  if (!req.headers.authorization) {
+      return res.status(401).send('Unauthorized request')
+  } 
   let token = req.headers.authorization.split(' ')[1]
-  if(token === 'null') {
-    return res.status(401).send('Unauthorized request')    
+  console.log(token);
+  if (token === 'null') {
+      return res.status(401).send('Unauthorized request')
   }
-  let payload = jwt.verify(token, 'secretKey')
-  if(!payload) {
-    return res.status(401).send('Unauthorized request')    
-  }
-  req.userId = payload.subject
-  next()
+  jwt.verify(token, 'secretKey', function(err, payload) {
+           if(err){
+               return res.status(401).send('Unauthorized request')
+           }else{
+               req.userId = payload.subject
+               next()       
+          }    
+        }); 
+  //let payload = jwt.verify(token, 'secretKey');
+
+  //console.log(payload);
+  // try{
+  //  let payload = jwt.verify(token, 'secretKey');
+  // }catch(err) {  
+  //   console.log('inside error');
+  //   return res.status(401).send('Unauthorized request');
+  // }
+  //if(!payload) {
+      //return res.status(401).send('Unauthorized request')
+  //}
+  //req.userId = payload.subject
+  //next()
 }
 
 router.get('/events', (req,res) => {
